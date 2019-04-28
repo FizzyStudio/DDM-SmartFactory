@@ -1,4 +1,4 @@
-# DDM-SmartFactory 
+# DDM-Smart Factory 
 
 数据驱动制造-智慧工厂系统方案讨论
 
