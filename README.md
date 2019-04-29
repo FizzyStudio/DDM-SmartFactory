@@ -116,13 +116,190 @@ Data Driven Manufacturing. Smart Factory System Plan Design.
 ---
 ### 数据库设计思路 - DB Sehema
 
+##### 产品 - product
 
+- product_id
+   * 产品类型ID，唯一
+   * VARCHAR
+
+- product_name
+   * 产品名称
+
+- product_desc
+   * 产品描述
+ 
+ - create_time
+   * 产品类型的创建时间      
       
+- update_time
+   * 产品信息的更新时间
+
+##### 生产计划清单（列表） - work_plan_list
+
+- plan_list_id
+   * 生产计划ID
+
+- plan_id_count
+  * 包含的生产计划数量
+
+##### 生产计划 - work_plan
+
+- plan_id
+   * 生产计划项ID
+
+- plan_list_id
+   * 隶属于哪个生产计划列表
+
+- plan_desc
+   * 该生产计划的相关描述
+
+- product_id
+   * 该生产计划计划生产的产品类型ID
+
+- procedure_group_id
+   * 该生产计划使用的工序组ID
+
+- plan_output
+   * 计划的产量
+
+- actual_output
+   * 实际的产量
+
+- plan_status
+   * 描述生产计划的进展状态
+      + unpublished：未公布
+      + ongoing：进行中
+      + cancelled：已取消（v1.0暂不考虑）
+      + suspend：已暂停（v1.0暂不考虑）
+      + finished：已结束，不管是否完成
+
+- plan_result
+   * 描述生产计划的完成状态
+      + exceed_done：超额完成
+      + incompleted：未完成，但已结束
+      + done：完成
+
+- plan_start_time
+   * 计划的开始时间
+
+- plan_finish_time
+   * 计划的结束时间
+
+- actual_start_time
+   * 时间开始的时间
+
+- actual_finish_time
+   * 实际结束的时间
+
+- create_time
+   * 创建时间      
       
+- update_time
+   * 更新时间
+
+##### 工序组 procedure_group
+
+- group_id
+   * 工序组ID
+
+- group_name
+   * 工序组名称
+
+- product_id
+   * 对应的产品类型ID
+
+- procedure_bitmap
+   * 所有用到的工序ID做与运算
+
+- procedure_sequence
+   * json格式存储所有用到的工序ID的顺序
+   * {1:c, 2:b, 3:e, 4:a, ...}
+
+##### 工序 - work_procedure
+
+- procedure_id
+   * 工序ID，唯一
+   * 每个procedure只占用1bit位
+
+- procedure_name
+   * 工序名，用于对外显示
+
+- procedure_desc
+   * 工序的描述
+
+- procedure_property
+   * 描述工序的属性
+      + 该工序是否是头工序？不是；可以是也可以不是；必须是
+      + 该工序是否是尾工序？不是；可以是也可以不是；必须是
+      + 该工序是否是抽检工序？不是；可以是也可以不是；必须是
+      + 该工序需要扫码次数？0,1,2...
+      + 是否支持多生产计划同时处理？
+      + 是否支持暂停和恢复功能？
+
+- procedure_status
+   * 描述工序当前的状态
+      + idle：所有正在进行的生产计划都没有用到当前工序（v1.0支持）
+      + busy：正在进行的生产计划中有用到当前工序（v1.0支持）
+      + suspend：正在进行的生产计划中有用到当前工序，但由于某种原因暂停中（v1.0暂时不考虑）
+      + not configured：当前工序没有配置好，不能使用（v1.0暂时不考虑）
+
+- work_site_count
+   * 当前工序包含的工位数
+
+- procedure_help
+   * 工序指导说明链接
+
+- create_time
+   * 工序的创建时间      
       
+- update_time
+   * 工序的更新时间
+
+-  v1.0版本默认以下属性
+   *  每个工序都默认支持多生产计划处理
+   *  新建生产计划（工序组）时，默认只指定用到哪些工序，不具体到工序下的工位，用到的工序下的默认工位都视为参与该生产计划（工序组）
+   *  不考虑工序的暂停和恢复功能
+
+##### 工位 - work_site
+
+- site_id
+   * 工位的ID，唯一，自增
+
+- procedure_id
+   * 工序的ID，当前工位隶属于哪个工序
+
+- site_index
+   * 一个工序可能配置多个工位，表示当前工位在所属的工序下的索引号
+
+- site_name
+   * 工位的中文名：一般等于工序名+索引号
+
+- site_property
+   * 描述工位的属性
+      + 是否支持多生产计划同时处理？
+      + 是否支持暂停和恢复功能？
+      + 工位是否绑定操作人员？只有负责人员有操作权限？
+      + 工位是否绑定设备？绑定设备的工位才可以作业？
+
+- site_status
+   * 工位当前的状态
+      + idle：所有正在进行的生产计划中没有用到当前工位
+      + busy：正在进行的生产计划中有使用当前工位
+      + suspend：正在进行的生产计划中有使用当前工位，但由于某种原因暂停中（暂时不考虑）
+      + not configured：当前工位没有配置好，不能使用（暂时不考虑）
+
+- site_desc
+   * 工位工作内容的描述
+
+- create_time
+   * 工位的创建时间      
       
+- update_time
+   * 工位的更新时间
 
-
-
-
-
+-  v1.0版本默认以下属性
+   *  每个工位都默认支持多个生产计划的组装品在同一个工位上同时处理
+   *  新建生产计划（工序组）时，默认只指定用到哪些工序，不具体到工序下的工位，用到的工序下的默认工位都视为参与该生产计划（工序组）
+   *  不考虑设备绑定和解绑的功能
+   *  不考虑操作人员绑定和解绑的功能
+   *  不考虑暂停和恢复功能
