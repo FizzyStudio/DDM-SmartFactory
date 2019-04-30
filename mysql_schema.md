@@ -1,6 +1,10 @@
+# mysql schema 
 
+- work_site schema
+- work_procedure schema
 
-##### work_site schema
+---
+### work_site schema
 
     CREATE TABLE `work_site` (
       `site_id` int(64) unsigned NOT NULL AUTO_INCREMENT,
@@ -51,6 +55,66 @@
        *  不考虑生产和检测设备的绑定和解绑功能
        *  不考虑操作人员的绑定和解绑功能
        *  不考虑工位的暂停、恢复等功能
+   
+   ---
+   ### work_procedure schema
+   
+    CREATE TABLE `work_procedure` (
+      `procedure_id` int(64) unsigned NOT NULL COMMENT '工序ID，唯一，每种工序只占用1bit位，不同工序占用的bit位不同',
+      `procedure_name` varchar(64) NOT NULL COMMENT '工序名',
+      `procedure_desc` varchar(256) DEFAULT NULL COMMENT '工序的描述',
+      `procedure_property` int(32) unsigned NOT NULL DEFAULT '0' COMMENT '描述工序的属性',
+      `procedure_status` int(16) unsigned NOT NULL DEFAULT '0' COMMENT '描述工序当前的状态',
+      `work_site_count` int(8) unsigned NOT NULL DEFAULT '0',
+      `procedure_table` varchar(64) NOT NULL COMMENT '工序对应的表名',
+      `procedure_paras` varchar(2048) DEFAULT NULL,
+      `procedure_help` varchar(2048) DEFAULT NULL,
+      `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+      `extern1` varchar(64) DEFAULT NULL,
+      `extern2` varchar(64) DEFAULT NULL,
+      PRIMARY KEY (`procedure_id`),
+      UNIQUE KEY `id_UNIQUE` (`procedure_id`),
+      KEY `name_index` (`procedure_name`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+    - procedure_id
+       * 工序ID，唯一
+       * 每个procedure只占用1bit位
+    - procedure_name
+       * 工序名，用于对外显示
+    - procedure_desc
+       * 工序的描述
+    - procedure_property
+       * 描述工序的属性
+          + 该工序是否是头工序？不是；可以是也可以不是；必须是
+          + 该工序是否是尾工序？不是；可以是也可以不是；必须是
+          + 该工序是否是抽检工序？不是；可以是也可以不是；必须是
+          + 该工序需要扫码次数？0,1,2...
+          + 是否支持多生产计划同时处理？
+          + 是否支持暂停和恢复功能？
+    - procedure_status
+       * 描述工序当前的状态
+          + idle：所有正在进行的生产计划都没有用到当前工序（v1.0支持）
+          + busy：正在进行的生产计划中有用到当前工序（v1.0支持）
+          + suspend：正在进行的生产计划中有用到当前工序，但由于某种原因暂停中（v1.0暂时不考虑）
+          + not configured：当前工序没有配置好，不能使用（v1.0暂时不考虑）
+    - work_site_count
+       * 当前工序包含的工位数
+    - procedure_table
+       * 工序对应的记录表
+    - procedure_help
+       * 工序指导说明链接
+    - create_time
+       * 工序的创建时间      
+    - update_time
+       * 工序的更新时间
+   
+-  v0.1版本说明
+   *  支持并发处理：同一时间段内隶属于多个生产计划的组装品在同一工序中处理
+   *  新建生产计划（工序组）时，默认只指定用到哪些工序，不具体到工序下的工位，用到的工序下的默认工位都视为参与该生产计划（工序组）
+   *  不考虑工序的暂停和恢复功能
    
    
    
