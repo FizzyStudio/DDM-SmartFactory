@@ -117,7 +117,29 @@
        *  不考虑工序的暂停和恢复等功能
        *  不考虑抽检工序
    
+   ---
+   ### procedure_group schema
    
+    CREATE TABLE `procedure_group` (
+      `group_id` int(64) unsigned NOT NULL AUTO_INCREMENT,
+      `group_name` varchar(64) NOT NULL,
+      `product_id` varchar(64) NOT NULL,
+      `group_bitmap` int(64) unsigned NOT NULL,
+      `group_sequence` varchar(2048) NOT NULL,
+      `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+      `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+      `extern1` varchar(64) DEFAULT NULL,
+      `extern2` varchar(64) DEFAULT NULL,
+      PRIMARY KEY (`group_id`),
+      UNIQUE KEY `group_id_UNIQUE` (`group_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+    - group_id
+       * 工序组ID
+    - group_name
+       * 工序组名称
+    - product_id
+       * 对应的产品类型ID
    
    
    
