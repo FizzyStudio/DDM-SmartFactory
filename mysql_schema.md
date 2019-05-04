@@ -2,6 +2,7 @@
 
 - work_site schema
 - work_procedure schema
+- procedure_group schema
 
 ---
 ### work_site schema
@@ -124,22 +125,43 @@
       `group_id` int(64) unsigned NOT NULL AUTO_INCREMENT,
       `group_name` varchar(64) NOT NULL,
       `product_id` varchar(64) NOT NULL,
+      `group_tag` varchar(64) NOT NULL,
       `group_bitmap` int(64) unsigned NOT NULL,
       `group_sequence` varchar(2048) NOT NULL,
+      `group_status` int(16) unsigned DEFAULT '0',
       `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
       `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
       `extern1` varchar(64) DEFAULT NULL,
       `extern2` varchar(64) DEFAULT NULL,
       PRIMARY KEY (`group_id`),
-      UNIQUE KEY `group_id_UNIQUE` (`group_id`)
+      UNIQUE KEY `group_id_UNIQUE` (`group_id`),
+      KEY `group_name_index` (`group_name`),
+      KEY `group_tag_index` (`group_tag`) /*!80000 INVISIBLE */,
+      KEY `product_id_index` (`product_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
     - group_id
-       * 工序组ID
+       * 工序组ID，唯一
     - group_name
-       * 工序组名称
+       * 工序组名称，对外显示
     - product_id
-       * 对应的产品类型ID
-   
-   
-   
+       * 关联的产品类型ID
+    - group_tag
+       * 工序组历史版本标签，在原有工序组基础上的修改，存为新的工序组（group_id不同），但group_tag相同
+    - procedure_bitmap
+       * 所有用到的工序ID“与”运算的结果
+    - procedure_sequence
+       * json格式存储所有用到的工序ID的顺序
+       * {total:10, 1:c, 2:b, 3:e, 4:a, ...}
+    - group_status
+       * 工序组当前的状态
+          + 是否有生产计划关联了当前工序组？
+          + 该工序组处于激活状态或删除状态？
+          + 该工序组是否是最新版本？
+    - create_time
+       * 工序组的创建时间
+    - update_time
+       * 工序组的更新时间
+       
+
+       
