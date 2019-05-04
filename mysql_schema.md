@@ -3,6 +3,8 @@
 - work_site schema
 - work_procedure schema
 - procedure_group schema
+- work_plan (work_plan_item) schema
+- work_plan_list schema
 
 ---
 ### work_site schema
@@ -162,6 +164,36 @@
        * 工序组的创建时间
     - update_time
        * 工序组的更新时间
-       
 
-       
+---       
+### work_plan (work_plan_item) schema
+
+    CREATE TABLE `work_plan` (
+      `plan_id` int(64) unsigned NOT NULL AUTO_INCREMENT,
+      `plan_list_id` int(64) unsigned DEFAULT NULL,
+      `plan_name` varchar(64) NOT NULL,
+      `plan_desc` varchar(256) DEFAULT NULL,
+      `product_id` varchar(64) NOT NULL,
+      `procedure_group_id` int(64) NOT NULL,
+      `plan_output` bigint(64) unsigned DEFAULT NULL,
+      `actual_output` bigint(64) unsigned DEFAULT NULL,
+      `plan_status` int(8) unsigned NOT NULL DEFAULT '0',
+      `plan_result` int(8) unsigned NOT NULL DEFAULT '0',
+      `plan_start_time` datetime DEFAULT NULL,
+      `plan_finish_time` datetime DEFAULT NULL,
+      `actual_start_time` datetime DEFAULT NULL,
+      `actual_finish_time` datetime DEFAULT NULL,
+      `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+      `extern1` varchar(64) DEFAULT NULL,
+      `extern2` varchar(64) DEFAULT NULL,
+      PRIMARY KEY (`plan_id`),
+      UNIQUE KEY `id_UNIQUE` (`plan_id`),
+      KEY `name_index` (`plan_name`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+---       
+### work_plan_list schema
+
+
+
