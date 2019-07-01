@@ -1,0 +1,70 @@
+<% layout('/layouts/default.html', {title: '产品型号信息管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('产品型号信息管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('product:productType:edit')){ %>
+					<a href="${ctx}/product/productType/form" class="btn btn-default btnTool" title="${text('新增产品型号信息')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${productType}" action="${ctx}/product/productType/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('型号描述')}：</label>
+					<div class="control-inline">
+						<#form:input path="descripe" maxlength="500" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="500" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("型号描述")}', name:'descripe', index:'a.descripe', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/product/productType/form?productTid='+row.productTid+'" class="btnList" data-title="${text("编辑产品型号信息")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("名称")}', name:'name', index:'a.name', width:150, align:"left"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('product:productType:edit')){ %>
+				actions.push('<a href="${ctx}/product/productType/form?productTid='+row.productTid+'" class="btnList" title="${text("编辑产品型号信息")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/product/productType/disable?productTid='+row.productTid+'" class="btnList" title="${text("停用产品型号信息")}" data-confirm="${text("确认要停用该产品型号信息吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/product/productType/enable?productTid='+row.productTid+'" class="btnList" title="${text("启用产品型号信息")}" data-confirm="${text("确认要启用该产品型号信息吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/product/productType/delete?productTid='+row.productTid+'" class="btnList" title="${text("删除产品型号信息")}" data-confirm="${text("确认要删除该产品型号信息吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
